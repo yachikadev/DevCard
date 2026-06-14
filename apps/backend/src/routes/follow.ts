@@ -6,11 +6,11 @@ import { followLogSchema } from '../validations/follow.validation.js';
 
 export async function followRoutes(app: FastifyInstance) {
     app.addHook('preHandler', async (request, reply) => {
-      const server = request.server as any;
-      if (typeof server?.authenticate === 'function') { await server.authenticate(request, reply); return }
-      if (typeof (app as any).authenticate === 'function') { await (app as any).authenticate(request, reply); return }
-      try { const payload = await request.jwtVerify(); if (payload) (request as any).user = payload; } catch (e) { reply.status(401).send({ error: 'Unauthorized' }) }
-    });
+    const server = request.server;
+    if (typeof server?.authenticate === 'function') { await server.authenticate(request, reply); return }
+    if (typeof app.authenticate === 'function') { await app.authenticate(request, reply); return }
+    try { const payload = await request.jwtVerify(); if (payload) request.user = payload; } catch (e) { reply.status(401).send({ error: 'Unauthorized' }) }
+  });
 
   // ─── Follow via API (Layer 1) ───
   // Currently supports: GitHub
@@ -19,7 +19,7 @@ export async function followRoutes(app: FastifyInstance) {
     request: FastifyRequest<{ Params: { platform: string; targetUsername: string } }>,
     reply: FastifyReply
   ) => {
-    const userId = (request.user as any).id;
+    const userId = request.user.id;
     const { platform, targetUsername } = request.params;
 
     // GitHub follow tokens are stored under 'github_follow' to prevent the
@@ -116,7 +116,7 @@ export async function followRoutes(app: FastifyInstance) {
     }>,
     reply: FastifyReply
   ) => {
-    const userId = (request.user as any).id;
+    const userId = request.user.id;
     const { platform, targetUsername } = request.params;
 
     const parsed = followLogSchema.safeParse(request.body);
@@ -137,8 +137,8 @@ export async function followRoutes(app: FastifyInstance) {
         },
       });
       return reply.send({ status: 'success', logId: log.id });
-    } catch (error: any) {
-      app.log.error('Failed to log follow:', error);
+    } catch (error) {
+      app.log.error(`Failed to log follow: ${getErrorMessage(error)}`);
       return reply.status(500).send({ error: 'Failed to log follow event' });
     }
   });
@@ -148,7 +148,7 @@ export async function followRoutes(app: FastifyInstance) {
     request: FastifyRequest<{ Params: { platform: string; targetUsername: string } }>,
     reply: FastifyReply
   ) => {
-    const userId = (request.user as any).id;
+    const userId = request.user.id;
     const { platform, targetUsername } = request.params;
 
     await app.prisma.followLog.deleteMany({
