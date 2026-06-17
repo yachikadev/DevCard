@@ -102,7 +102,14 @@ async function buildApp(): Promise<FastifyInstance> {
   app.decorateRequest('jwtVerify', function () {
     return mockJwtVerify();
   });
-
+  app.decorate('authenticate', async function (request, reply) {
+  try {
+    const payload = await request.jwtVerify();
+    if (payload) request.user = payload as typeof request.user;
+  } catch {
+    return reply.status(401).send({ error: 'Unauthorized' });
+  }
+  });
   await app.register(teamRoutes);
   await app.ready();
   return app;

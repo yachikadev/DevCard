@@ -27,7 +27,7 @@ type TeamProfile = {
 export async function teamRoutes(app: FastifyInstance): Promise<void> {
         app.post<{
             Body: {name: string, description? : string, avatarUrl?: string }
-        }>('/',{ preHandler: [app.authenticate.bind(app)] }, async (request, reply): Promise<void> => {
+        }>('/',{ preHandler: [app.authenticate] }, async (request, reply): Promise<void> => {
         const userId = request.user.id;
         const parsed = createTeamScehma.safeParse(request.body); 
         if(!parsed.success){
@@ -152,7 +152,7 @@ export async function teamRoutes(app: FastifyInstance): Promise<void> {
 
     })
 
-        app.post<{Params: {slug:string}, Body:{username:string}}>('/:slug/members', { preHandler: [app.authenticate.bind(app)] }, async (request, reply): Promise<void> => {
+        app.post<{Params: {slug:string}, Body:{username:string}}>('/:slug/members', { preHandler: [app.authenticate] }, async (request, reply): Promise<void> => {
         const paramsSlug = request.params.slug; 
         const userId = request.user.id;
         const parsed = inviteMembers.safeParse(request.body); 
@@ -214,7 +214,7 @@ export async function teamRoutes(app: FastifyInstance): Promise<void> {
         }
     })
 
-    app.delete<{Params: {slug: string, userId: string}}>('/:slug/members/:userId',{ preHandler: [app.authenticate.bind(app)] }, async (request, reply): Promise<void> => {
+    app.delete<{Params: {slug: string, userId: string}}>('/:slug/members/:userId',{ preHandler: [app.authenticate] }, async (request, reply): Promise<void> => {
         const paramsSlug = request.params.slug 
         const paramsUserId = request.params.userId
         const userId = request.user.id;
@@ -276,7 +276,9 @@ export async function teamRoutes(app: FastifyInstance): Promise<void> {
         }
     })
 
-    app.patch<{Params: {slug: string},Body: {description?:string, name?:string, avatarUrl?:string}}>('/:slug',{ preHandler: [app.authenticate.bind(app)] }, async (request, reply): Promise<void> => {
+    app.patch<{Params: {slug: string},Body: {description?:string, name?:string, avatarUrl?:string}}>('/:slug',{ preHandler: [app.authenticate
+        
+    ] }, async (request, reply): Promise<void> => {
         const userId = request.user.id;
         const paramsSlug = request.params.slug; 
         const parsed = updateTeam.safeParse(request.body); 
@@ -318,7 +320,7 @@ export async function teamRoutes(app: FastifyInstance): Promise<void> {
         
     })
 
-   app.delete<{Params:{slug: string}}>('/:slug',{ preHandler: [app.authenticate.bind(app)] }, async (request, reply): Promise<void> => {
+   app.delete<{Params:{slug: string}}>('/:slug',{ preHandler: [app.authenticate] }, async (request, reply): Promise<void> => {
         const userId = request.user.id;
         const paramsSlug = request.params.slug; 
 
