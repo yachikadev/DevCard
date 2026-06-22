@@ -1,4 +1,4 @@
-import Fastify from 'fastify';
+import Fastify,{LightMyRequestResponse} from 'fastify';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import { eventRoutes } from '../routes/event';
@@ -107,7 +107,7 @@ async function createEvent(
   app: FastifyInstance,
   body: Record<string, unknown>,
   authenticated = true,
-) {
+): Promise<LightMyRequestResponse>  {
   return app.inject({
     method: 'POST',
     url: '/api/events',
@@ -488,7 +488,13 @@ describe('Events API', () => {
     /** Builds a raw EventAttendee row as Prisma returns it (with nested user) */
     function makeAttendeeRow(
       profile: typeof MOCK_USER_PROFILE | typeof MOCK_OTHER_USER_PROFILE,
-    ) {
+          ) : {
+        id: string;
+        userId: string;
+        eventId: string;
+        joinedAt: Date;
+        user: typeof MOCK_USER_PROFILE | typeof MOCK_OTHER_USER_PROFILE;
+      }  {
       return {
         id: `attendee-${profile.id}`,
         userId: profile.id,
