@@ -4,7 +4,7 @@
 
 | Version | Supported |
 |---------|-----------|
-| main    | ✅ Yes    |
+| latest  | ✅        |
 
 ## Reporting a Vulnerability
 
@@ -21,11 +21,9 @@ Please report via **GitHub Private Security Advisory**:
 
 ## Response Timeline
 
-| Action                    | Timeframe       |
-|---------------------------|-----------------|
-| Acknowledgement of report | Within 48 hours |
-| Status update             | Within 7 days   |
-| Patch / fix release       | Within 30 days  |
+- Acknowledgement: within 48–72 hours
+- Status update: within 7 days
+- Patch / fix release: within 30 days
 
 ## In Scope
 - Authentication bypass
